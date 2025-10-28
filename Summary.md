@@ -27,19 +27,19 @@ Once you've finished through thinking through and answering all these questions,
 
 ## Logistics
 
-### How many hours do you estimate the assignment took? [1 point]
+### How many hours do you estimate the assignment took?
 
 _Rather than giving a range, if you are unsure, give the averages of the range._
 
-### Who did you work with and how? [1 point]
+### Who did you work with and how?
 
 
-### What other resources did you use? [1 point]
+### What other resources did you use?
 
 _Please give specific URLs (not just "Stack Overflow" or "Baeldung") and
 state which ones were particularly helpful._
 
-## Reflections [2 points]
+## Reflections
 
 Give **one or more paragraphs** reflecting on your experience with the
 assignment, including answers to all of these questions:

@@ -7,13 +7,15 @@ This assignment is based on the Nifty Assignment [Bias Bars](http://nifty.stanfo
 
 ## Learning Outcomes
 
-- Working with interfaces and abstract classes
+- Working with abstract methods
+- Working with static methods
 - Parsing a `json` file into a dictionary
+- Normalizing data
 - Visualizing data
 
-In this assignment, you will write code to plot the data in an interesting way.
-Plotting and visualizing across professor gender and review quality reveals interesting trends about human language usage. 
-We hope that you will be able to use this exercise in data visualization to also think critically about the underlying biases that exist in online datasets.
+In this assignment, you will write code to plot data about college professor reviews from the popular website [RateMyProfessors.com](RateMyProfessors.com).
+Plotting and visualizing word frequency data from reviews and comparing across professor gender and review quality reveals interesting trends about human language usage. 
+We hope that you will be able to use this exercise in data visualization to also think critically about the biases that exist in online datasets.
 
 ## Introduction
 
@@ -22,18 +24,20 @@ You will analyze a historical dataset consisting of nearly 20 years of reviews o
 Teacher ratings are a common and impactful facet of life in university -- we fill out course reviews at the end of every term.
 Future students use the results of these reviews to help them choose their classes and plan their academic futures.
 However, teaching evaluations are not an objective source of truth about the quality of a professor's teaching.
-Recent research has shown that teaching evaluations often demonstrate harmful biases, including gender bias.
+Recent research has shown that [teaching evaluations often demonstrate harmful biases, including gender bias](https://www.insidehighered.com/news/2019/05/20/fighting-gender-bias-student-evaluations-teaching-and-tenures-effect-instruction).
 The bias in teaching evaluations is a problem because the scores are often used in decisions about who to hire, fire, tenure, and promote.
-Your goal is to build a piece of software that helps you investigate and reason about how humans use language in gendered (and potentially biased) ways.
+**Your goal is to build a piece of software that helps you investigate and reason about how humans use language in gendered (and potentially biased) ways.**
 Here are two screen shots of the program you will build:
 
-First when exploring the word "class":
+**First when exploring the word "class":**
 The x values are [0, 1, 2] which we have turned into labels "Low Reviews", "Medium Reviews", "High Reviews".
 The y values for women are [4856.251650382888, 3515.315553208344, 11329.87853181938]
 The y values for men are [4161.032213925694, 3543.692174480071, 10871.598616730716]
 
+![scores for "class"](<images/women_men_class.png>)
 
-Second when exploring the word "funny":
+
+**Second when exploring the word "funny":**
 The x values are [0, 1, 2] which we have turned into labels "Low Reviews", "Medium Reviews", "High Reviews".
 The y values for women are [49.51148666490626, 90.77105888566146, 651.9012410879324]
 The y values for men are [93.53636961297322, 299.3163827615143, 1101.0566937298563]
@@ -53,11 +57,15 @@ Each section defines a distinct, manageable milestone that will allow you to use
 2. Write some code to create bar charts for an inputted word.
 3. Using your functional `BiasBars` application, explore the dataset to identify possible instances of biased/gendered use of language.
 
-Implementation tip: We highly recommend reading over all of the parts of this assignment first to get a sense of what you’re being asked to do before you start coding. It’s much harder to write the program if you just implement each separate milestone without understanding how it fits into the larger picture.
+**Implementation tip: We highly recommend reading over all of the parts of this assignment first to get a sense of what you’re being asked to do before you start coding.** It’s much harder to write the program if you just implement each separate milestone without understanding how it fits into the larger picture.
 
 ## Milestone 1: Load in the json and understand the dictionary structure
 
-In this milestone you are going to load in the json and then read through this to understand the structure of the dictionary created by loading in the json. This assignment uses real world data from RateMyProfessors.com, an online platform that enables students to leave anonymous, public reviews about their college/university professors. A typical review on RateMyProfessors.com consists of an overall numerical rating of quality (from 1-5), a number of qualitative tags (like "amazing lectures" or "difficult exams"), and a freeresponse comment section where students can write a short paragraph describing their experience with the professor. An example review is shown below:
+In this milestone you are going to load in the json and then read through this to understand the structure of the dictionary created by loading in the json.
+
+This assignment uses real world data from RateMyProfessors.com, an online platform that enables students to leave anonymous, public reviews about their college/university professors. A typical review on RateMyProfessors.com consists of an overall numerical rating of quality (from 1-5), a number of qualitative tags (like "amazing lectures" or "difficult exams"), and a freeresponse comment section where students can write a short paragraph describing their experience with the professor. An example review is shown below:
+
+![RateMyProfessors.com review of Nick Parlante](<images/RateMyProfessors_Nick_Parlante.png>)
 
 
 The power of the Internet makes this platform for reviews accessible to the global community of students, empowering students to make decisions about classes they might want to take or universities they might want to attend based on the quality of instruction. The indirectness and anonymity of being behind a computer or phone screen also gives people a sense of security to say whatever they want, which can range from the supportive or constructive to the downright offensive or harmful. In analyzing this dataset you will be working to answer the following question: **does a professor's gender influence the language people use to describe them?**
@@ -69,6 +77,8 @@ In this dataset, gender is the only piece of information we have about these peo
 
 ### Loading in the data
 Implement the function `load_dictionary_from_json(filename)` in `data_loader.py`. This function takes in a filename, which will be a `.json`, opens the file, loads it into a variable, and returns that variable. Loading this json will provide you with a dictionary that is provided in more detail below.
+
+**Make sure to test any functions that you write.**
 
 ### The data structure we have built for you to use
 To begin with, we need to consider the issue of being able to organize the data by the numerical rating associated with the review, since we want to be able to identify trends in how a given word is used in positive reviews vs. negative reviews. Since numerical rating is a float (real value) that can take on many different values between 1.0 and 5.0, we are going to make our data processing task simpler by representing review quality using only three "buckets":
@@ -108,11 +118,11 @@ Let's break down the organization of this data structure a little bit with an ex
 
 - Finally, we're one step away from our end goal. The last step is to index into the innermost list to get the word count associated with the specific review bucket we want to analyze. We know that high reviews fall in the last bucket of our list (index 2), so we access our overall desired count with the expression `word_data["great"]["W"][2]` which finally gives us the desired count of **800**.
 
-Now that we have covered the structure as well as how to access different values within the nested structure, we can move on to the coding that you will have to do for the assignment: building a cool visualization for this data! We have already completed almost all of the file reading for you and stored this into the file `word_data.json`.
+Now that we have covered the structure as well as how to access different values within the nested structure, we can move on to the coding that you will have to do for the assignment: building a cool visualization for this data! We have already completed almost all of the review data parsing for you and stored it in the file `word_data.json`.
 
-## Milestone 2: Creating the plots
+## Milestone 2: Create the plots
 
-In this section you will write code in `plot_women_words(word_data, word, max_frequency)` using your matplotlib skills to create bar charts for each word. Each bar chart should have a separate bar for the low, medium, and high reviews measuring the frequency of the given word in that review category for that gender. Recall that in order to make a plot you need a list of x values and a list of y values. Below is example code to create a bar chart:
+In this section you will write code in `word_plotter.py` using your matplotlib skills to create bar charts for each word. Each bar chart should have a separate bar for the low, medium, and high reviews measuring the frequency of the given word in that review category for that gender. Recall that in order to make a plot you need a list of x values and a list of y values. Below is example code to create a bar chart:
 ```
 x_vals = # some list of x values
 y_vals = # seom list of y values
@@ -120,15 +130,19 @@ plt.bar(x_vals, y_vals, color="tab:orange")
 plt.title("Awesome Title Here")
 ```
 
-For the bar chart for women's data, you will want to access the reviews in the dictionary with the key 'W' in order to build your list of y values. For the bar chart for men's data, you will want to access the reviews in the dictionary with the key 'M' in order to build your list of y values. The x values for each bar chart has been provided for you.
-
-To test this, we have provided you with a `main()` function that takes the word that you want to plot as a command line argument. To save you time, we wrote the `main()` function, but feel free to check it out to understand how it works. When you are ready to test, you can run the following in the VS Code Terminal:
+**You are not required to test the methods where the only output is a plot.**
+To "test" the plotting functions (and also run them to get output), use the `main()` function in `main.py`.
+The `main()` function takes the word that you want to plot as a command line argument.
+In order for the `main()` function to work, you will need to implement the part that uses your data loader and plotter.
+When you are ready to test, you can run the following in the terminal:
 
 `python3 biasbarsgraph.py funny`
 
-where you can replace 'funny' with any word that you want to see plotted. Note that the graphs may show up on top of each other so you can drag the top one over to the side in order to see the bottom graph.
+where you can replace 'funny' with any word that you want to see plotted. **Note that the graphs may show up on top of each other, so you can drag the top one over to the side in order to see the bottom graph.**
 
 Below are example screenshots for the plots of the word funny. These should pop up if you run the line from above.
+
+![scores for "funny"](images/women_men_funny.png)
 
 ## Milestone 3:  Identifying bias in the dataset and other interesting data science ethics questions
 
@@ -137,6 +151,6 @@ In this milestone you are going to think critically about the RateMyProfessors.c
 ## A Brief History of BiasBars
 This assignment is based on the Nifty Assignment [Bias Bars](http://nifty.stanford.edu/2022/bowman-creel-woodrow-bias-bars).
 
-Here is what they describe as the history of this assignment:
+Here is their history of this assignment:
 
 > BiasBars was originally created as a spinoff of NameSurfer, a past CS106A assignment developed by Stanford lecturer Nick Parlante that asked students to graph data about the popularity of baby names over time. For an ethics-themed hackathon in April 2018, Jennie Yang and Monica Anuforo, two of our awesome section leaders in the CS198 program decided to create a parody of NameSurfer that instead graphed information about gender and RateMyProfessor reviews, based on an applet created by history professor Ben Schmidt of Northeastern University. (The data you will be using for this assignment will be very similar, but not from the exact same source as Professor Schmidt's applet.) Monica and Jennie worked with Colin Kincaid, a former CS198 Coordinator and CS106A Lecturer, to turn the NameSurfer spinoff developed at the hackathon into the original Bias Bars assignment, which was done in Java and assigned in the summer of 2018. The ethical themes explored by their assignment played really well with so many of the topics that we've covered in the course this quarter! So, Juliette Woodrow modified this BiasBars assignment to provide opportunities for exploring the interesting dataset using matplotlib, moving away from the original NameSurfer idea, but keeping the interesting ethical component.
