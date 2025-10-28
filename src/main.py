@@ -1,5 +1,5 @@
 import sys
-from typing import Optional
+import matplotlib.pyplot as plt
 
 sys.path.append(".")
 
@@ -19,13 +19,19 @@ def main() -> None:
     if len(sys.argv) > 2:
         data_filename = sys.argv[2]
     else:
-        data_filename = "word_data.json"
+        data_filename = "data/full-data.txt"
 
-    # YOUR CODE HERE:
-    # 1. Load the data from the file whose name is data_filename
-    # 2. Extract gender data for the word from the loaded dictionary
-    # 3. Calculate maximum frequency for consistent y-axis scaling across both plots
-    # 4. Create and display both plots
+    data = DataLoader.load_dictionary(data_filename)
+
+    max_frequency = 0
+    for gender, frequencies in data.get(word, {}).items():
+        max_frequency = max(max_frequency, *frequencies)
+
+    fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(10, 4))
+    WomenWordPlotter().plot(word, data, max_frequency, ax1)
+    MenWordPlotter().plot(word, data, max_frequency, ax2)
+
+    plt.show()  # type: ignore
 
 
 if __name__ == "__main__":

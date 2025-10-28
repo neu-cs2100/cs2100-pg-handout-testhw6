@@ -1,14 +1,15 @@
-import json
+import os
+import pandas as pd
 
 
 class DataLoader:
     """Handles loading and processing of data files."""
 
     @staticmethod
-    def load_dictionary_from_json(filename: str) -> None:
+    def load_dictionary(filename: str) -> None:
         """
-        This function opens the json file, loads it into a variable and returns the variable.
+        Loads the given file's contents as a dictionary and returns it.
         """
-        # Please replace the return type to reflect the nested dictionary returned.
-        # YOUR CODE HERE to load JSON data
         pass
+
+    # Please replace the return type to reflect the nested dictionary.

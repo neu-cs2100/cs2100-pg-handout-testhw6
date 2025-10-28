@@ -9,7 +9,8 @@ This assignment is based on the Nifty Assignment [Bias Bars](http://nifty.stanfo
 
 - Working with abstract methods
 - Working with static methods
-- Parsing a `json` file into a dictionary
+- Parsing a text file
+- Building a dictionary
 - Normalizing data
 - Visualizing data
 
@@ -30,17 +31,13 @@ The bias in teaching evaluations is a problem because the scores are often used 
 Here are two screen shots of the program you will build:
 
 **First when exploring the word "class":**
-The x values are [0, 1, 2] which we have turned into labels "Low Reviews", "Medium Reviews", "High Reviews".
-The y values for women are [4856.251650382888, 3515.315553208344, 11329.87853181938]
-The y values for men are [4161.032213925694, 3543.692174480071, 10871.598616730716]
 
 ![scores for "class"](<images/women_men_class.png>)
 
 
 **Second when exploring the word "funny":**
-The x values are [0, 1, 2] which we have turned into labels "Low Reviews", "Medium Reviews", "High Reviews".
-The y values for women are [49.51148666490626, 90.77105888566146, 651.9012410879324]
-The y values for men are [93.53636961297322, 299.3163827615143, 1101.0566937298563]
+
+![scores for "funny"](images/women_men_funny.png)
 
 
 We want to provide you with some background about why being able to investigate and
@@ -53,20 +50,17 @@ Identifying issues of bias and representation in datasets is a natural extension
 ## Assignment Overview
 
 Each section defines a distinct, manageable milestone that will allow you to use the power of decomposition to build a complex final program out of many small, testable components.
-1. Load in and understand the dataset and `word_data` dictionary. Use the `json` module to load in the data. After loading in the data, learn more about the dataset that you will be exploring and the nested data structure.
+1. Load in and understand the dataset and `word_data` dictionary.
 2. Write some code to create bar charts for an inputted word.
 3. Using your functional `BiasBars` application, explore the dataset to identify possible instances of biased/gendered use of language.
 
 **Implementation tip: We highly recommend reading over all of the parts of this assignment first to get a sense of what you’re being asked to do before you start coding.** It’s much harder to write the program if you just implement each separate milestone without understanding how it fits into the larger picture.
 
-## Milestone 1: Load in the json and understand the dictionary structure
-
-In this milestone you are going to load in the json and then read through this to understand the structure of the dictionary created by loading in the json.
+## Milestone 1: Load the data and understand the dictionary structure
 
 This assignment uses real world data from RateMyProfessors.com, an online platform that enables students to leave anonymous, public reviews about their college/university professors. A typical review on RateMyProfessors.com consists of an overall numerical rating of quality (from 1-5), a number of qualitative tags (like "amazing lectures" or "difficult exams"), and a freeresponse comment section where students can write a short paragraph describing their experience with the professor. An example review is shown below:
 
 ![RateMyProfessors.com review of Nick Parlante](<images/RateMyProfessors_Nick_Parlante.png>)
-
 
 The power of the Internet makes this platform for reviews accessible to the global community of students, empowering students to make decisions about classes they might want to take or universities they might want to attend based on the quality of instruction. The indirectness and anonymity of being behind a computer or phone screen also gives people a sense of security to say whatever they want, which can range from the supportive or constructive to the downright offensive or harmful. In analyzing this dataset you will be working to answer the following question: **does a professor's gender influence the language people use to describe them?**
 
@@ -76,17 +70,17 @@ A note on gender vs sex:
 In this dataset, gender is the only piece of information we have about these people’s social identities; the dataset does not include other salient identities such as race and ability. Furthermore, gender is only classified into the categories of woman and man, which means non-binary people are unfortunately not represented. We choose to describe the two genders included in this dataset as “woman” and “man” rather than “female” and “male,” as the former terms refer to gender and social role whereas the latter typically refer to sex assigned at birth. Professors do not have the opportunity to describe their own gender identity; this data represents the guesses of students. **We will reflect further on this point in the ethics questions at the end of the assignment.**
 
 ### Loading in the data
-Implement the function `load_dictionary_from_json(filename)` in `data_loader.py`. This function takes in a filename, which will be a `.json`, opens the file, loads it into a variable, and returns that variable. Loading this json will provide you with a dictionary that is provided in more detail below.
+Implement the function `load_dictionary(filename)` in `data_loader.py`. This function takes in a filename, which will be a `.txt`, reads through the file of professor reviews, stores the counts by word / gender in a dictionary, and returns that dictionary.
 
 **Make sure to test any functions that you write.**
 
-### The data structure we have built for you to use
+### The data structure
 To begin with, we need to consider the issue of being able to organize the data by the numerical rating associated with the review, since we want to be able to identify trends in how a given word is used in positive reviews vs. negative reviews. Since numerical rating is a float (real value) that can take on many different values between 1.0 and 5.0, we are going to make our data processing task simpler by representing review quality using only three "buckets":
 - Reviews with a numerical rating of less than 2.5 will be considered "low reviews".
 - Reviews with a numerical rating between 2.5 and 3.5 (inclusive on both ends of range) will be considered "medium reviews"
 - Reviews with a numerical rating above 3.5 will be considered "high reviews"
 
-With this knowledge, here is a data structure that we built for you to organize word frequencies (counts) across both gender and review quality. The data structure for this program (which we will refer to as `word_data`) is a dictionary that has a key for every word (a string) that we come across in the dataset. The value associated with each word is another (nested) dictionary, which maps gender to a list of word counts, broken down by rating quality (the ordering is counts for low reviews, then medium reviews, then high reviews). This data is provided to you in json form in the file `word_data.json`. You will need to load it in using the json module in order to get it in the form shown below. A partial example of this data structure would look something like this:
+Here is a data structure that we will use to organize word frequencies (counts) across both gender and review quality. The data structure for this program (which we will refer to as `word_data`) is a dictionary that has a key for every word (a string) that we come across in the dataset. The value associated with each word is another (nested) dictionary, which maps gender to a list of word counts, broken down by rating quality (the ordering is counts for low reviews, then medium reviews, then high reviews). You will need to build this dictionary from the text file containing reviews in order to get it in the form shown below. A partial example of this data structure would look something like this:
 
 ```
 {
@@ -103,7 +97,7 @@ With this knowledge, here is a data structure that we built for you to organize 
 
 Let's break down the organization of this data structure a little bit with an example. Let's say we wanted to access the current count of occurrences of the word "great" in high reviews for women (which we can see to be 800 from the above diagram). What steps could we take in our code to traverse the nested data structure to access that value?
 
-- First, we need to load in the data from the `word_data.json` file and store it in a variable called `word_data`. We can then access the overall `word_data` dictionary to get the data associated with the word "great". This gives us an inner dictionary that looks like this:
+- First, we can access the overall `word_data` dictionary to get the data associated with the word "great". This gives us an inner dictionary that looks like this:
 ```
 {
     'W': [30, 100, 800],
@@ -116,9 +110,7 @@ Let's break down the organization of this data structure a little bit with an ex
 [30, 100, 800]
 ```
 
-- Finally, we're one step away from our end goal. The last step is to index into the innermost list to get the word count associated with the specific review bucket we want to analyze. We know that high reviews fall in the last bucket of our list (index 2), so we access our overall desired count with the expression `word_data["great"]["W"][2]` which finally gives us the desired count of **800**.
-
-Now that we have covered the structure as well as how to access different values within the nested structure, we can move on to the coding that you will have to do for the assignment: building a cool visualization for this data! We have already completed almost all of the review data parsing for you and stored it in the file `word_data.json`.
+- Finally, the last step is to index into the innermost list to get the word count associated with the specific review bucket we want to analyze. We know that high reviews fall in the last bucket of our list (index 2), so we access our overall desired count with the expression `word_data["great"]["W"][2]` which finally gives us the desired count of **800**.
 
 ## Milestone 2: Create the plots
 
@@ -133,12 +125,11 @@ plt.title("Awesome Title Here")
 **You are not required to test the methods where the only output is a plot.**
 To "test" the plotting functions (and also run them to get output), use the `main()` function in `main.py`.
 The `main()` function takes the word that you want to plot as a command line argument.
-In order for the `main()` function to work, you will need to implement the part that uses your data loader and plotter.
 When you are ready to test, you can run the following in the terminal:
 
-`python3 biasbarsgraph.py funny`
+`python3 main.py funny`
 
-where you can replace 'funny' with any word that you want to see plotted. **Note that the graphs may show up on top of each other, so you can drag the top one over to the side in order to see the bottom graph.**
+where you can replace 'funny' with any word that you want to see plotted.
 
 Below are example screenshots for the plots of the word funny. These should pop up if you run the line from above.
 
